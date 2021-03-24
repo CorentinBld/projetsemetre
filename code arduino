@@ -1,0 +1,264 @@
+//Bibliotheque Utiliser 
+#include <SoftwareSerial.h>
+
+// Variables Globale
+// Variables Moteur
+int Power = 255; //Vitesse du moteur entre 0 et 255
+// Variables Choix Mode
+char mode;
+int i;
+int j;
+
+//Constants Globale
+//Constants Bluetooth
+SoftwareSerial hc06(10,11);
+//Constants LED
+#define RED_LED 9
+#define BLUE_LED 8
+#define GREEN_LED 7
+// Constants Moteur
+const int enableBridge = 2;
+const int MotorForward = 3;
+const int MotorReverse = 5;
+
+
+
+void setup(){
+  dcBegin();  
+}
+
+// Prog Main
+void loop(){
+//Partie reseption sur la carte 
+  if (hc06.available()){
+  mode = hc06.read();
+  Serial.print(mode);
+    // Si le message = red, allumer la LED Rouge
+      if (mode == 'R') {
+        red_led();
+      }
+      if (mode == 'M') {
+        Motor();
+      }
+      
+      if (mode == 'B') {
+        Led_Blue();
+      }
+
+      if (mode == 'G') {
+        Led_Green();
+      }
+
+      if (mode == 'C') {
+        Led_Cyan();
+      }
+
+      if (mode == 'P') {
+        Led_Purpule();
+      }
+
+      if (mode == 'W') {
+        Led_White();
+      }
+
+      if (mode == 'Y') {
+        Led_Yellow();
+      }
+
+      if (mode == 'b') {
+        i=0;
+        while (i!= 3){
+           Led_blink();
+            i=i+1;
+        }
+      }
+
+      if (mode == 'k') {
+        j=0;
+        while (j!= 2){
+          Led_PWM();
+          j=j+1; 
+        }
+      }
+  }
+      
+    
+
+  
+ 
+
+////Partie reseption sur le terminale(Moniteur Serie) 
+  if (Serial.available()){
+    mode = Serial.read();
+      hc06.print(mode);
+  }  
+    
+} 
+void dcBegin(){
+  // Initialise les pines utilisées pour le moteur
+  pinMode(MotorForward,OUTPUT);
+  pinMode(MotorReverse,OUTPUT);
+  pinMode(enableBridge,OUTPUT);
+  // Initialise les pines utilisées pour les LED
+  pinMode(RED_LED, OUTPUT);
+  pinMode(BLUE_LED, OUTPUT);
+  pinMode(GREEN_LED, OUTPUT);
+  analogWrite(RED_LED, 0);
+  analogWrite(GREEN_LED, 0);
+  analogWrite(BLUE_LED, 0);
+  // Initialise les pines utilisées pour la communication Bluetooth
+  Serial.begin(9600);
+  hc06.begin(9600);
+  }
+
+
+void red_led(){
+  analogWrite(RED_LED, 255);
+  analogWrite(GREEN_LED, 0);
+  analogWrite(BLUE_LED, 0);
+  delay(1000);
+  analogWrite(RED_LED, 0);
+  analogWrite(GREEN_LED, 0);
+  analogWrite(BLUE_LED, 0);  
+}
+void Led_Blue(){
+  analogWrite(RED_LED, 0);
+  analogWrite(GREEN_LED, 0);
+  analogWrite(BLUE_LED, 255);
+  delay(1000);
+  analogWrite(RED_LED, 0);
+  analogWrite(GREEN_LED, 0);
+  analogWrite(BLUE_LED, 0);  
+
+}
+void Led_Green(){
+  analogWrite(RED_LED, 0);
+  analogWrite(GREEN_LED, 255);
+  analogWrite(BLUE_LED, 0);
+  delay(1000);
+  analogWrite(RED_LED, 0);
+  analogWrite(GREEN_LED, 0);
+  analogWrite(BLUE_LED, 0);  
+}
+void Led_Cyan(){
+  analogWrite(RED_LED, 0);
+  analogWrite(GREEN_LED, 255);
+  analogWrite(BLUE_LED, 255);
+  delay(1000);
+  analogWrite(RED_LED, 0);
+  analogWrite(GREEN_LED, 0);
+  analogWrite(BLUE_LED, 0);  
+}
+void Led_Purpule(){
+  analogWrite(RED_LED, 255);
+  analogWrite(GREEN_LED, 0);
+  analogWrite(BLUE_LED, 255);
+  delay(1000);
+  analogWrite(RED_LED, 0);
+  analogWrite(GREEN_LED, 0);
+  analogWrite(BLUE_LED, 0);  
+}
+void Led_White(){
+  analogWrite(RED_LED, 255);
+  analogWrite(GREEN_LED, 255);
+  analogWrite(BLUE_LED, 255);
+  delay(1000);
+  analogWrite(RED_LED, 0);
+  analogWrite(GREEN_LED, 0);
+  analogWrite(BLUE_LED, 0);  
+}
+void Led_Yellow(){
+  analogWrite(RED_LED, 255);
+  analogWrite(GREEN_LED, 255);
+  analogWrite(BLUE_LED, 0);
+  delay(1000);
+  analogWrite(RED_LED, 0);
+  analogWrite(GREEN_LED, 0);
+  analogWrite(BLUE_LED, 0);   
+}
+void Led_blink(){
+  
+    analogWrite(RED_LED, 0);
+    analogWrite(GREEN_LED, 0);
+    analogWrite(BLUE_LED, 255);
+    delay(1000);
+    analogWrite(RED_LED, 0);
+    analogWrite(GREEN_LED, 0);
+    analogWrite(BLUE_LED, 0);
+    delay(500);
+  }
+    
+
+void Led_PWM(){
+  
+      int intensite=50;
+      analogWrite(RED_LED, intensite);
+
+      for (int i=0; i <= intensite; i++){
+        analogWrite(GREEN_LED, i);
+        delay(20);
+      }   
+
+    for (int i=0; i <= intensite; i++){
+      analogWrite(RED_LED, intensite-i);
+      delay(20);
+      }
+
+    for (int i=0; i <= intensite; i++){
+      analogWrite(BLUE_LED, i);
+      delay(20);
+     }   
+
+    for (int i=0; i <= intensite; i++){
+      analogWrite(GREEN_LED, intensite-i);
+      delay(20);
+      }
+
+    for (int i=0; i <= intensite; i++){
+      analogWrite(BLUE_LED, intensite-i);
+      delay(20);
+      }   
+
+    for (int i=0; i <= intensite; i++){
+      analogWrite(RED_LED, i);
+      delay(20);
+      }   
+     analogWrite(RED_LED, 0); 
+}
+
+
+void Motor(){
+  dcForward(Power);
+  delay(4000);
+  
+   dcStop();
+  delay(2000);
+  
+  dcReverse(Power);
+  delay(4000);
+  
+  dcStop();
+  delay(2000);
+}
+
+
+void dcForward(int P){
+  digitalWrite(enableBridge,HIGH); // Active pont en H
+  // Tourne dans le sens Forward à la vitesse spécifiée par P
+  analogWrite(MotorForward,P);
+  analogWrite(MotorReverse,0);
+}
+
+void dcReverse(int P){
+  digitalWrite(enableBridge,HIGH); // Active pont en H
+  // Tourne dans le sens Reverse à la vitesse spécifiée par P
+  analogWrite(MotorForward,0);
+  analogWrite(MotorReverse,P);
+}
+
+void dcStop(){
+  // Arrête le moteur et désactive le pont en H
+  analogWrite(MotorForward,0);
+  analogWrite(MotorReverse,0);
+  digitalWrite(enableBridge,LOW);
+}
